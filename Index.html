@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrinkMatch - Temukan Minuman Cocokmu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FEF3C7 0%, #FED7AA 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #F59E0B 0%, #EA580C 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            background: #F3F4F6;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #4B5563;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #E5E7EB;
+        }
+
+        .tab.active {
+            background: #F59E0B;
+            color: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #D1D5DB;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #F59E0B;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: #F59E0B;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #D97706;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-success {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #059669;
+        }
+
+        .btn:disabled {
+            background: #D1D5DB;
+            cursor: not-allowed;
+        }
+
+        .recommendations {
+            margin-top: 30px;
+        }
+
+        .recommendations h3 {
+            color: #374151;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .drink-card {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FED7AA 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #F59E0B;
+        }
+
+        .drink-card h4 {
+            color: #374151;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag {
+            background: #FED7AA;
+            color: #9A3412;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .type-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .type-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: #E5E7EB;
+            color: #374151;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .type-btn:hover {
+            background: #D1D5DB;
+        }
+
+        .type-btn.selected {
+            background: #F59E0B;
+            color: white;
+        }
+
+        .add-section {
+            background: #F9FAFB;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .add-section h3 {
+            color: #374151;
+            margin-bottom: 15px;
+        }
+
+        .drinks-list, .personality-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .drink-item, .personality-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            background: #F9FAFB;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+
+        .drink-item:hover, .personality-item:hover {
+            background: #F3F4F6;
+        }
+
+        .drink-info, .personality-info {
+            flex: 1;
+        }
+
+        .drink-info h4, .personality-info h4 {
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .delete-btn {
+            background: #EF4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #DC2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            background: #FEF3C7;
+            border-radius: 10px;
+            color: #92400E;
+            margin-top: 20px;
+        }
+
+        .section-label {
+            color: #6B7280;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .selected-types-display {
+            background: #FEF3C7;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .selected-types-display h4 {
+            color: #92400E;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .input-group button {
+            padding: 12px 24px;
+            background: #10B981;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .input-group button:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍹 DrinkMatch</h1>
+            <p>Temukan minuman yang cocok dengan kepribadianmu</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('search')">🔍 Cari Minuman</button>
+            <button class="tab" onclick="switchTab('manage')">➕ Kelola Minuman</button>
+            <button class="tab" onclick="switchTab('personality')">👤 Kelola Kepribadian</button>
+        </div>
+
+        <div class="content">
+            <!-- Halaman Cari Minuman -->
+            <div id="search-page" class="page active">
+                <div>
+                    <label>Pilih Tipe Kepribadianmu (bisa lebih dari satu):</label>
+                    <div class="type-buttons" id="searchTypeButtons"></div>
+
+                    <div class="selected-types-display" id="selectedTypesDisplay" style="display: none;">
+                        <h4>Tipe yang dipilih:</h4>
+                        <div class="tags" id="selectedTypesList"></div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="findDrinks()">Cari Minuman Cocok</button>
+                </div>
+
+                <div id="recommendations" class="recommendations" style="display: none;">
+                    <h3>Rekomendasi Minuman:</h3>
+                    <div id="recommendationsList"></div>
+                </div>
+
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    Belum ada minuman untuk tipe ini. Tambahkan di menu Kelola Minuman!
+                </div>
+            </div>
+
+            <!-- Halaman Kelola Minuman -->
+            <div id="manage-page" class="page">
+                <div class="add-section">
+                    <h3>Tambah Minuman Baru</h3>
+                    <input type="text" id="drinkName" placeholder="Nama minuman...">
+                    
+                    <div style="margin-top: 15px;">
+                        <div class="section-label">Pilih tipe yang cocok (bisa lebih dari satu):</div>
+                        <div class="type-buttons" id="typeButtons"></div>
+                    </div>
+
+                    <button class="btn btn-success" onclick="addDrink()">➕ Tambah Minuman</button>
+                </div>
+
+                <div>
+                    <h3 style="color: #374151; margin-bottom: 15px;">Daftar Minuman (<span id="drinkCount">0</span>)</h3>
+                    <div class="drinks-list" id="drinksList"></div>
+                </div>
+            </div>
+
+            <!-- Halaman Kelola Kepribadian -->
+            <div id="personality-page" class="page">
+                <div class="add-section">
+                    <h3>Tambah Tipe Kepribadian Baru</h3>
+                    <div class="input-group">
+                        <input type="text" id="personalityName" placeholder="Nama tipe kepribadian...">
+                        <button onclick="addPersonality()">➕ Tambah</button>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="color: #374151; margin-bottom: 15px;">Daftar Tipe Kepribadian (<span id="personalityCount">0</span>)</h3>
+                    <div class="personality-list" id="personalityList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let personalityTypes = [];
+        let drinks = [];
+        let selectedTypes = [];
+        let userSelectedTypes = [];
+
+        // Inisialisasi
+        function init() {
+            loadPersonalityTypes();
+            loadDrinks();
+        }
+
+        // Load personality types
+        function loadPersonalityTypes() {
+            const stored = localStorage.getItem('personality-types');
+            if (stored) {
+                personalityTypes = JSON.parse(stored);
+            } else {
+                personalityTypes = ['Energik', 'Santai', 'Kreatif', 'Fokus', 'Sosial', 'Introvert'];
+                savePersonalityTypes();
+            }
+            renderTypeButtons();
+            renderSearchTypeButtons();
+            renderPersonalityList();
+        }
+
+        // Save personality types
+        function savePersonalityTypes() {
+            localStorage.setItem('personality-types', JSON.stringify(personalityTypes));
+            renderTypeButtons();
+            renderSearchTypeButtons();
+            renderPersonalityList();
+        }
+
+        // Add personality type
+        function addPersonality() {
+            const name = document.getElementById('personalityName').value.trim();
+            
+            if (!name) {
+                alert('Masukkan nama tipe kepribadian!');
+                return;
+            }
+
+            if (personalityTypes.includes(name)) {
+                alert('Tipe kepribadian ini sudah ada!');
+                return;
+            }
+
+            personalityTypes.push(name);
+            savePersonalityTypes();
+            
+            document.getElementById('personalityName').value = '';
+            alert('Tipe kepribadian berhasil ditambahkan!');
+        }
+
+        // Delete personality type
+        function deletePersonality(type) {
+            if (confirm(`Hapus tipe "${type}"?\n\nPeringatan: Minuman yang menggunakan tipe ini akan kehilangan tipe tersebut.`)) {
+                personalityTypes = personalityTypes.filter(t => t !== type);
+                
+                // Remove dari drinks
+                drinks.forEach(drink => {
+                    drink.types = drink.types.filter(t => t !== type);
+                });
+                
+                savePersonalityTypes();
+                saveDrinks();
+            }
+        }
+
+        // Render personality list
+        function renderPersonalityList() {
+            const container = document.getElementById('personalityList');
+            const count = document.getElementById('personalityCount');
+            
+            count.textContent = personalityTypes.length;
+            container.innerHTML = '';
+
+            personalityTypes.forEach(type => {
+                const item = document.createElement('div');
+                item.className = 'personality-item';
+                
+                item.innerHTML = `
+                    <div class="personality-info">
+                        <h4>${type}</h4>
+                    </div>
+                    <button class="delete-btn" onclick="deletePersonality('${type}')">🗑️ Hapus</button>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+
+        // Load drinks dari storage
+        function loadDrinks() {
+            const stored = localStorage.getItem('drinks-data');
+            if (stored) {
+                drinks = JSON.parse(stored);
+            } else {
+                drinks = [
+                    { id: 1, name: 'Espresso', types: ['Energik', 'Fokus'] },
+                    { id: 2, name: 'Chamomile Tea', types: ['Santai', 'Introvert'] },
+                    { id: 3, name: 'Smoothie Buah', types: ['Energik', 'Sosial'] },
+                    { id: 4, name: 'Green Tea', types: ['Fokus', 'Santai'] },
+                    { id: 5, name: 'Cappuccino', types: ['Kreatif', 'Sosial'] },
+                ];
+                saveDrinks();
+            }
+            renderDrinksList();
+        }
+
+        // Simpan drinks ke storage
+        function saveDrinks() {
+            localStorage.setItem('drinks-data', JSON.stringify(drinks));
+            renderDrinksList();
+        }
+
+        // Switch tab
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + '-page').classList.add('active');
+        }
+
+        // Render type buttons untuk manage drinks
+        function renderTypeButtons() {
+            const container = document.getElementById('typeButtons');
+            container.innerHTML = '';
+            
+            personalityTypes.forEach(type => {
+                const btn = document.createElement('button');
+                btn.className = 'type-btn';
+                btn.textContent = type;
+                btn.onclick = () => toggleType(type, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        // Render type buttons untuk search
+        function renderSearchTypeButtons() {
+            const container = document.getElementById('searchTypeButtons');
+            container.innerHTML = '';
+            
+            personalityTypes.forEach(type => {
+                const btn = document.createElement('button');
+                btn.className = 'type-btn';
+                btn.textContent = type;
+                btn.onclick = () => toggleUserType(type, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        // Toggle type selection untuk manage drinks
+        function toggleType(type, btn) {
+            if (selectedTypes.includes(type)) {
+                selectedTypes = selectedTypes.filter(t => t !== type);
+                btn.classList.remove('selected');
+            } else {
+                selectedTypes.push(type);
+                btn.classList.add('selected');
+            }
+        }
+
+        // Toggle type selection untuk user search
+        function toggleUserType(type, btn) {
+            if (userSelectedTypes.includes(type)) {
+                userSelectedTypes = userSelectedTypes.filter(t => t !== type);
+                btn.classList.remove('selected');
+            } else {
+                userSelectedTypes.push(type);
+                btn.classList.add('selected');
+            }
+            updateSelectedTypesDisplay();
+        }
+
+        // Update display tipe yang dipilih
+        function updateSelectedTypesDisplay() {
+            const display = document.getElementById('selectedTypesDisplay');
+            const list = document.getElementById('selectedTypesList');
+            
+            if (userSelectedTypes.length > 0) {
+                display.style.display = 'block';
+                list.innerHTML = userSelectedTypes.map(type => 
+                    `<span class="tag">${type}</span>`
+                ).join('');
+            } else {
+                display.style.display = 'none';
+            }
+        }
+
+        // Add drink
+        function addDrink() {
+            const name = document.getElementById('drinkName').value.trim();
+            
+            if (!name) {
+                alert('Masukkan nama minuman!');
+                return;
+            }
+            
+            if (selectedTypes.length === 0) {
+                alert('Pilih minimal satu tipe!');
+                return;
+            }
+
+            const newDrink = {
+                id: Date.now(),
+                name: name,
+                types: [...selectedTypes]
+            };
+
+            drinks.push(newDrink);
+            saveDrinks();
+
+            // Reset form
+            document.getElementById('drinkName').value = '';
+            selectedTypes = [];
+            document.querySelectorAll('#typeButtons .type-btn').forEach(btn => btn.classList.remove('selected'));
+            
+            alert('Minuman berhasil ditambahkan!');
+        }
+
+        // Delete drink
+        function deleteDrink(id) {
+            if (confirm('Hapus minuman ini?')) {
+                drinks = drinks.filter(d => d.id !== id);
+                saveDrinks();
+            }
+        }
+
+        // Render drinks list
+        function renderDrinksList() {
+            const container = document.getElementById('drinksList');
+            const count = document.getElementById('drinkCount');
+            
+            count.textContent = drinks.length;
+            container.innerHTML = '';
+
+            drinks.forEach(drink => {
+                const item = document.createElement('div');
+                item.className = 'drink-item';
+                
+                const tags = drink.types.map(type => 
+                    `<span class="tag">${type}</span>`
+                ).join('');
+
+                item.innerHTML = `
+                    <div class="drink-info">
+                        <h4>${drink.name}</h4>
+                        <div class="tags">${tags}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteDrink(${drink.id})">🗑️ Hapus</button>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+
+        // Find drinks
+        function findDrinks() {
+            if (userSelectedTypes.length === 0) {
+                alert('Pilih minimal satu tipe kepribadian terlebih dahulu!');
+                return;
+            }
+
+            // Cari minuman yang memiliki setidaknya satu tipe yang dipilih
+            let matches = drinks.filter(drink => 
+                drink.types.some(type => userSelectedTypes.includes(type))
+            );
+
+            // Hitung skor kecocokan (berapa banyak tipe yang cocok)
+            matches = matches.map(drink => {
+                const matchCount = drink.types.filter(type => 
+                    userSelectedTypes.includes(type)
+                ).length;
+                return { ...drink, matchScore: matchCount };
+            });
+
+            // Urutkan berdasarkan skor tertinggi
+            matches.sort((a, b) => b.matchScore - a.matchScore);
+
+            // Ambil hanya 1 minuman dengan skor tertinggi
+            const topMatch = matches.length > 0 ? [matches[0]] : [];
+            
+            const recommendationsDiv = document.getElementById('recommendations');
+            const emptyStateDiv = document.getElementById('emptyState');
+            const listDiv = document.getElementById('recommendationsList');
+
+            if (topMatch.length > 0) {
+                recommendationsDiv.style.display = 'block';
+                emptyStateDiv.style.display = 'none';
+                
+                listDiv.innerHTML = topMatch.map(drink => {
+                    const tags = drink.types.map(type => 
+                        `<span class="tag">${type}</span>`
+                    ).join('');
+
+                    return `
+                        <div class="drink-card">
+                            <h4>${drink.name}</h4>
+                            <div class="tags">${tags}</div>
+                            <p style="margin-top: 10px; color: #92400E; font-size: 14px;">
+                                ✨ Cocok dengan ${drink.matchScore} dari ${userSelectedTypes.length} tipe yang kamu pilih
+                            </p>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                recommendationsDiv.style.display = 'none';
+                emptyStateDiv.style.display = 'block';
+            }
+        }
+
+        // Jalankan inisialisasi
+        init();
+    </script>
+</body>
+</html>
